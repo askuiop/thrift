@@ -17,17 +17,19 @@
 # under the License.
 #
 
-all-local:
-	$(DARTPUB) get
+#
+# This will fix up the distribution so that CPAN properly
+# indexes Thrift.
+#
 
-clean-local:
-	$(RM) -r .pub
-	find . -type d -name "packages" | xargs $(RM) -r
-	find . -type f -name ".packages" | xargs $(RM)
-	find . -type f -name "pubspec.lock" | xargs $(RM)
+use 5.10.0;
+use strict;
+use warnings;
+use utf8;
 
-check-local: all
+use Data::Dumper;
+use CPAN::Meta;
 
-EXTRA_DIST = \
-	.analysis_options
-
+my $meta = CPAN::Meta->load_file('META.json');
+$meta->{'provides'} = { 'Thrift' => { 'file' => 'lib/Thrift.pm', 'version' => $meta->version() } };
+$meta->save('META.json');
